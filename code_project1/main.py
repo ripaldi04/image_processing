@@ -112,6 +112,10 @@ class ImageProcessingApp:
         self.after = tk.Label(after_card, bg="white")
         self.after.pack()
 
+        # LABEL HASIL EFek
+        self.result_label = tk.Label(after_card, text="", bg="white", fg="#2B2D42",
+                                    font=("Segoe UI", 11, "italic"))
+        self.result_label.pack(pady=(10, 0))
         # ===== MENU GROUP =====
         menu_area = tk.Frame(content, bg="#DDE3FF")
         menu_area.pack(pady=30)
@@ -162,6 +166,8 @@ class ImageProcessingApp:
             self.processed_image = None
             self.show(self.original_image, self.before)
             self.after.config(image="")
+            self.result_label.config(text="")
+
 
     def resize_image(self, img):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -181,6 +187,8 @@ class ImageProcessingApp:
         img_rgb = cv2.resize(img_rgb, (new_w, new_h))
         return ImageTk.PhotoImage(Image.fromarray(img_rgb))
 
+    def set_result_text(self, text):
+        self.result_label.config(text=f"Hasil: {text}")
 
     def show(self, img, panel):
         img_tk = self.resize_image(img)
@@ -192,32 +200,42 @@ class ImageProcessingApp:
         if self.original_image is not None:
             self.processed_image = ImageContrast.contrast_stretch(self.original_image)
             self.show(self.processed_image, self.after)
+            self.set_result_text("Contrast Stretch")
+
 
     def apply_butterworth(self):
         if self.original_image is not None:
             self.processed_image = ImageRestoration.butterworth_lowpass(self.original_image)
             self.show(self.processed_image, self.after)
+            self.set_result_text("Butterworth Low-pass Filter")
+
 
     def apply_median(self):
         if self.original_image is not None:
             self.processed_image = ImageRestoration.median_filter(self.original_image)
             self.show(self.processed_image, self.after)
+            self.set_result_text("Median Filter")
+
 
     def apply_wiener(self):
         if self.original_image is not None:
             self.processed_image = ImageRestoration.wiener_filter(self.original_image)
             self.show(self.processed_image, self.after)
-            
+            self.set_result_text("Wiener Filter")
+
     def apply_gamma(self):
         if self.original_image is not None:
             # gamma default = 1.5 (lebih terang)
             self.processed_image = ImageContrast.gamma_correction(self.original_image, gamma=1.5)
             self.show(self.processed_image, self.after)
+            self.set_result_text("Gamma Correction (γ=1.5)")
 
     def apply_hist_eq(self):
         if self.original_image is not None:
             self.processed_image = ImageContrast.histogram_equalization(self.original_image)
             self.show(self.processed_image, self.after)
+            self.set_result_text("Histogram Equalization")
+
 
 
     def apply_channel(self, channel):
